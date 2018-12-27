@@ -306,7 +306,6 @@ project(':iceberg-presto-runtime') {
         shadow "org.apache.avro:avro:$avroVersion"
         shadow ("org.apache.hive:hive-standalone-metastore:$hiveVersion") {
             exclude group: 'org.apache.hadoop', module: 'hadoop-common'
-//            exclude group: 'org.apache.orc', module: 'orc-core'
         }
     }
 
@@ -315,6 +314,19 @@ project(':iceberg-presto-runtime') {
     tasks.javadocJar.dependsOn tasks.shadowJar
 
     shadowJar {
+        dependencies {
+            exclude(dependency('org.apache.logging.log4j:log4j-core'))
+            exclude(dependency('org.apache.parquet:parquet-column'))
+            exclude(dependency('org.apache.parquet:parquet-format'))
+            exclude(dependency('org.apache.parquet:parquet-encoding'))
+            exclude(dependency('org.apache.parquet:parquet-hadoop'))
+            exclude(dependency('org.apache.parquet:parquet-common'))
+            exclude(dependency('org.apache.parquet:parquet-jackson'))
+            exclude(dependency('org.codehaus.jackson:jackson-core-asl'))
+            exclude(dependency('org.codehaus.jackson:jackson-mapper-asl'))
+            exclude(dependency('org.apache.hadoop:hadoop-hdfs'))
+        }
+
         zip64 true
         exclude 'org/htrace/**'
         exclude 'org/objectweb/**'
