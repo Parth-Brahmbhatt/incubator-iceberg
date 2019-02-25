@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.netflix.iceberg.BaseMetastoreTableOperations.METADATA_FOLDER_NAME;
 import static com.netflix.iceberg.TableProperties.COMMIT_MAX_RETRY_WAIT_MS;
 import static com.netflix.iceberg.TableProperties.COMMIT_MAX_RETRY_WAIT_MS_DEFAULT;
 import static com.netflix.iceberg.TableProperties.COMMIT_MIN_RETRY_WAIT_MS;
@@ -291,7 +292,19 @@ class BaseTransaction implements Transaction {
 
     @Override
     public String metadataFileLocation(String fileName) {
-      return ops.metadataFileLocation(fileName);
+      if (type == TransactionType.CREATE_TABLE) {
+        final TableMetadata metadata = BaseTransaction.this.current;
+        String metadataLocation = current().properties()
+                .get(TableProperties.WRITE_METADATA_LOCATION);
+
+        if (metadataLocation != null) {
+          return String.format("%s/%s", metadataLocation, fileName);
+        } else {
+          return String.format("%s/%s/%s", metadata.location(), METADATA_FOLDER_NAME, fileName);
+        }
+      } else {
+        return ops.metadataFileLocation(fileName);
+      }
     }
 
     @Override
